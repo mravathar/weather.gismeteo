@@ -77,7 +77,7 @@ class WebClient(requests.Session):
         try:
             r = func(url, **kwargs)
             r.raise_for_status()
-        except (requests.HTTPError, requests.ConnectionError) as e:
+        except requests.exceptions.RequestException as e:
             self._log_error(e)
             raise WebClientError(e)
         else:

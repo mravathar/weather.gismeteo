@@ -1,7 +1,7 @@
-#  Gismeteo Weather Forecast for KODI
+# Gismeteo для Kodi Omega
 
-[![Build Status](https://img.shields.io/travis/vlmaksime/weather.gismeteo/kodi-release.svg)](https://travis-ci.org/vlmaksime/weather.gismeteo)
-[![Codacy Badge](https://img.shields.io/codacy/grade/dd33ef722bc144a5b25eb8cf79e3eee4/kodi-release.svg)](https://www.codacy.com/app/vlmaksime/weather.gismeteo)
-[![codecov](https://img.shields.io/codecov/c/github/vlmaksime/weather.gismeteo/kodi-release.svg)](https://codecov.io/gh/vlmaksime/weather.gismeteo/branch/kodi-release)
-[![GitHub license](https://img.shields.io/github/license/vlmaksime/weather.gismeteo.svg)](https://github.com/vlmaksime/weather.gismeteo/blob/master/LICENSE)
-[![KODI Support](https://img.shields.io/badge/KODI-17%2B-yellowgreen.svg)](https://kodi.tv/)
+Этот форк основан на официальном пакете `weather.gismeteo` версии `0.6.4+matrix.1`. Он исправляет зависание обновления погоды, при котором Kodi часами показывает «Ожидайте» вместо температуры. У каждого запроса есть тайм-аут соединения и чтения. После сетевой ошибки дополнение повторяет запрос прогноза или определения города один раз. [Исходный проект](https://github.com/vlmaksime/weather.gismeteo)
+
+Для установки скачайте файл `weather.gismeteo-<версия>.zip` из вложений к релизу. В Kodi откройте «Дополнения» → «Установить из ZIP-файла» и выберите архив. Форк использует прежний идентификатор дополнения и настройки городов. [Релизы](https://github.com/mravathar/weather.gismeteo/releases)
+
+Код распространяется под GPL-3.0-only. Сервис предоставляет прогноз для личного некоммерческого использования. [Лицензия](weather.gismeteo/LICENSE.txt)

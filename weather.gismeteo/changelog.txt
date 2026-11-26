@@ -1,3 +1,6 @@
+v0.6.4+matrix.1.fork.1
+- Limit connect and read waits. Retry a failed forecast or IP lookup once.
+
 v0.6.4 (2023-11-30)
 - Adapted to changes in the service API
 - Added German translation (kyoforkshomebrews)

@@ -24,6 +24,7 @@ class GismeteoError(Exception):
 
 class GismeteoClient(object):
     _base_url = 'https://services.gismeteo.net/inform-service/inf_chrome'
+    REQUEST_TIMEOUT = (3.05, 6.0)  # Connect and read inactivity, in seconds.
 
     def __init__(self, lang='en'):
 
@@ -48,6 +49,7 @@ class GismeteoClient(object):
     def _get(self, url, params=None, *args, **kwargs):
         params = params or {}
         params['lang'] = self._lang
+        kwargs.setdefault('timeout', self.REQUEST_TIMEOUT)
 
         r = self._client.get(url, params=params, *args, **kwargs)
         return r

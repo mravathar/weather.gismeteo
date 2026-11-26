@@ -27,6 +27,10 @@ WEATHER_ICON = weather.weather_icon
 CURRENT_TIME = {'unix': time.time()}
 
 
+class _WeatherAborted(Exception):
+    """Kodi requested shutdown during a weather update."""
+
+
 def set_item_info(props, item, item_type, icon='%s.png', day_temp=None):
     keys = list(props.keys())
 
@@ -204,22 +208,13 @@ def clear():
         weather.set_properties(_36hour_props, '36Hour', count)
 
 
-def refresh_locations():
+def refresh_locations(ip_location=None):
     locations = 0
     if weather.get_setting('CurrentLocation'):
-        try:
-            lang = weather.gismeteo_lang()
-            ip_locations = _ip_locations(lang)
-        except (GismeteoError, WebClientError) as e:
-            weather.notify_error(e)
-            location = Location()
-        else:
-            for ip_location in ip_locations:
-                location = Location(ip_location)
-                break
-
+        if ip_location is None:
+            ip_location = get_location('1')
         locations += 1
-        weather.set_property('Location{0}'.format(locations), location.name)
+        weather.set_property('Location{0}'.format(locations), ip_location.name)
 
     for count in range(1, MAX_LOCATIONS + 1):
         loc_name = weather.get_setting('Location{0}'.format(count))
@@ -361,18 +356,21 @@ def set_location_props(forecast_info):
 
 @weather.action('root')
 def forecast(params):
-    location = get_location(params.id)
-    if location.id:
-        try:
-            lang = weather.gismeteo_lang()
-            data = _location_forecast(lang, location.id)
-        except (GismeteoError, WebClientError) as e:
-            weather.notify_error(e)
-            clear()
-        else:
-            set_location_props(data)
+    try:
+        location = get_location(params.id)
+        if location.id:
+            try:
+                lang = weather.gismeteo_lang()
+                data = _location_forecast(lang, location.id)
+            except (GismeteoError, WebClientError) as e:
+                weather.notify_error(e)
+                clear()
+            else:
+                set_location_props(data)
 
-    refresh_locations()
+        refresh_locations(location if params.id == '1' else None)
+    except _WeatherAborted:
+        return
 
 
 @weather.action()
@@ -466,17 +464,23 @@ def get_location(loc_id):
 def _call_method(func, params=None):
     params = params or {}
 
-    retry = 0
     monitor = xbmc.Monitor()
-    while not monitor.abortRequested():
+    if monitor.abortRequested():
+        raise _WeatherAborted()
+    for attempt in range(2):
         try:
-            return func(**params)
-        except (GismeteoError, WebClientError, ImportError) as e:
-            if retry >= 10:
-                raise e
-        finally:
-            retry += 1
-            monitor.waitForAbort(1)
+            result = func(**params)
+        except (GismeteoError, WebClientError, ImportError):
+            if monitor.abortRequested():
+                raise _WeatherAborted()
+            if attempt == 1:
+                raise
+            if monitor.waitForAbort(1):
+                raise _WeatherAborted()
+        else:
+            if monitor.abortRequested():
+                raise _WeatherAborted()
+            return result
 
 
 if __name__ == '__main__':
